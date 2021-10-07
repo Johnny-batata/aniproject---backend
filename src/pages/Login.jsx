@@ -24,7 +24,6 @@ const Login = () => {
     const login = await loginUser(userInfo);
     if (login) {
       localStorage.setItem('token', login.token);
-      // console.log(login.token);
       return setRedirect(true);
     }
   };
