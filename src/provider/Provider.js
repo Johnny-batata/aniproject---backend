@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { createContext, useEffect, useState } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
-import { getAnimesByStatus } from '../services/api';
+import { getAnimesByStatus, getAnimesByCategorys } from '../services/api';
 
 const Context = createContext();
 
@@ -37,7 +37,7 @@ const Provider = ({ children }) => {
 
   const defaultStatus = {
     statusNow: 'current',
-    statusCategorie: 'All',
+    statusCategorie: { name: 'All', id: 0 },
   };
   const [userInfo, setUserInfo] = useState(user);
   const [casting, setCasting] = useState(defaultCasting);
@@ -47,21 +47,52 @@ const Provider = ({ children }) => {
   const [categorys, setCategorys] = useState([]);
 
   const fetchCast = async (curr) => {
-    // console.log(current, 'funciona ');
     const { [status.statusNow]: { categories } } = casting;
     const castingData = await getAnimesByStatus(curr, status.statusNow);
-    console.log(castingData.dataNew, 'fetch cast data', casting);
 
-    const dataOfCasting = casting[status.statusNow].categories[status.statusCategorie];
-    // console.log(castingData.dataNew, 'fetch cast data', dataOfCasting);
+    const dataOfCasting = casting[status.statusNow].categories[status.statusCategorie.name];
     const Animedata = dataOfCasting.concat(castingData.dataNew);
-    // console.log(Animedata, 'animedata');
 
     setButtonsLength(castingData.totalLength);
     return setCasting({ ...casting,
       [status.statusNow]: {
         categories: {
-          [status.statusCategorie]: Animedata,
+          ...categories,
+          [status.statusCategorie.name]: Animedata,
+
+        },
+      },
+    });
+  };
+
+  const fetchCastByCategories = async (categoryId) => {
+    const { [status.statusNow]: { categories } } = casting;
+    const castingData = await getAnimesByCategorys(0, categoryId, status.statusNow);
+
+    const dataOfCasting = casting[status.statusNow].categories[status.statusCategorie.name];
+
+    if (!dataOfCasting) {
+      const Animedata = castingData.dataNew;
+      setButtonsLength(castingData.totalLength);
+
+      return setCasting({ ...casting,
+        [status.statusNow]: {
+          categories: {
+            ...categories,
+            [status.statusCategorie.name]: Animedata,
+          },
+        },
+
+      });
+    }
+    // const Animedata = dataOfCasting.concat(castingData.dataNew);
+    // console.log(dataOfCasting, 'dataCasting', castingData, 'casting data');
+
+    setButtonsLength(castingData.totalLength);
+    return setCasting({ ...casting,
+      [status.statusNow]: {
+        categories: {
+          [status.statusCategorie.name]: Animedata,
         },
       },
     });
@@ -81,6 +112,7 @@ const Provider = ({ children }) => {
     setStatus,
     categorys,
     setCategorys,
+    fetchCastByCategories,
   };
 
   const location = useLocation();

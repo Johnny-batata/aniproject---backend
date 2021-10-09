@@ -57,21 +57,20 @@ const getAnimesByStatus = async (offset = 0, status = 'CURRENT') => {
 
   const data = await responses;
   if (data.err) { return invokeAlert(data.err.message); }
-  const dataNew = data.data.map(({
-    id, attributes: { titles: { en_jp }, updatedAt, posterImage: { tiny }, averageRating },
-  }) => ({ id, title: en_jp, updatedAt, tiny, averageRating, offset }));
-  console.log(data);
+  const dataNew = data.data.map(async ({
+    id, attributes: { titles: { en_jp }, updatedAt, posterImage: { tiny }, averageRating }, relationships: { episodes: { links: { self } } }, categoriasId,
+  }) => {
+    const fetchEpisodes = await fetch(self);
+    const episodesData = await fetchEpisodes.json();
+
+    return { id, title: en_jp, updatedAt, tiny, averageRating, offset, categoriasId, episodesData: episodesData.data.length };
+  });
 
   const totalLength = [];
   for (let i = 1; (i * 40) <= (data.totalLength + 40); i += 1) {
-    // if ((el * 40)  >  (buttonsLength + 40) ) return ;
-
-    console.log(i);
     totalLength.push(i);
   }
-  console.log(totalLength);
-
-  return { dataNew, totalLength };
+  return { totalLength, dataNew: await Promise.all(dataNew) };
 };
 
 const getAnimesCategorys = async (offset = 0) => {
@@ -89,8 +88,43 @@ const getAnimesCategorys = async (offset = 0) => {
     .catch((err) => err);
 
   const data = await responses;
+  console.log(data, 'data');
   if (data.err) { return invokeAlert(data.err.message); }
   return data.data;
 };
 
-export { registerNewUser, loginUser, getAnimesByStatus, getAnimesCategorys };
+const getAnimesByCategorys = async (offset = 0, categoryId, status) => {
+  const endpoint = `http://localhost:10000/animesCategorys/${offset}/${categoryId}/${status}`;
+  const token = localStorage.getItem('token');
+  const responses = fetch(endpoint, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      authorization: token,
+    },
+  })
+    .then((response) => response.json())
+    .then((data) => data)
+    .catch((err) => err);
+
+  const data = await responses;
+  // console.log(data, 'data');
+  if (data.err) { return invokeAlert(data.err.message); }
+  const dataNew = data.data.map(async ({
+    id, attributes: { titles: { en_jp }, updatedAt, posterImage: { tiny }, averageRating }, relationships: { episodes: { links: { self } } }, categoriasId,
+  }) => {
+    const fetchEpisodes = await fetch(self);
+    const episodesData = await fetchEpisodes.json();
+
+    return { id, title: en_jp, updatedAt, tiny, averageRating, offset, categoriasId, episodesData: episodesData.data.length };
+  });
+
+  const totalLength = [];
+  for (let i = 1; (i * 40) <= (data.totalLength + 40); i += 1) {
+    totalLength.push(i);
+  }
+  return { totalLength, dataNew: await Promise.all(dataNew) };
+};
+
+export {
+  registerNewUser, loginUser, getAnimesByStatus, getAnimesCategorys, getAnimesByCategorys };

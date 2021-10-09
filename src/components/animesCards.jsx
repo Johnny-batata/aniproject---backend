@@ -6,7 +6,8 @@ import { Context } from '../provider/Provider';
 import { getAnimesCategorys } from '../services/api';
 
 const AnimesCards = () => {
-  const { casting, buttonHandler: { currentButton }, buttonsLength, buttonHandler, setButtonHandler, fetchCast, status, categorys, setCategorys } = useContext(Context);
+  const { casting, buttonHandler: {
+    currentButton }, buttonsLength, buttonHandler, setButtonHandler, setCasting, fetchCast, status, categorys, setCategorys, setStatus, fetchCastByCategories } = useContext(Context);
 
   const fetchCategorys = async () => {
     const data = await getAnimesCategorys();
@@ -17,13 +18,53 @@ const AnimesCards = () => {
     fetchCategorys();
   }, []);
 
-  const changeCategory = ({ target: { value } }) => {
+  useEffect(() => {
+    const { statusCategorie: { id } } = status;
 
+    fetchCastByCategories(id);
+  }, [status.statusCategorie.name]);
+
+  const changeCategory = ({ target: { value, name } }) => {
+    // console.log('changeou', value);
+    const { [status.statusNow]: { categories } } = casting;
+    setStatus({ ...status, statusCategorie: { name, id: value } });
+    setButtonHandler({ ...buttonHandler, currentButton: 0, buttonsHistory: 0 });
+
+    const dataOfCasting = casting[status.statusNow].categories[status.statusCategorie.name];
+    const verifyOffset = dataOfCasting.some(({ offset }) => offset === buttonHandler.currentButton * 40);
+    console.log(verifyOffset);
+
+    console.log('cy', [status.statusCategorie.name], dataOfCasting);
+    if (!dataOfCasting) {
+      console.log('entrou no console ');
+      return fetchCastByCategories(value);
+    }
+    return setCasting({ ...casting,
+      [status.statusNow]: {
+        categories: {
+          ...categories,
+          [status.statusCategorie.name]: dataOfCasting,
+        },
+      },
+    });
+
+    // console.log(dataOfCasting, 'change category', casting[status.statusNow].categories);
   };
 
   const renderCategorys = () => (
     <S.Categorydiv>
-      {categorys.data.map(({ attributes: { title } }, index) => (<button key={ index } type="button">{title}</button>))}
+      {categorys.data.map(({ attributes: { title }, id }, index) => (
+        <button
+          key={ index }
+          type="button"
+          onClick={ changeCategory }
+          value={ id }
+          name={ title }
+        >
+          {title}
+
+        </button>
+      ))}
     </S.Categorydiv>
   );
 
@@ -35,14 +76,19 @@ const AnimesCards = () => {
       </p>
       <p>
         {el.averageRating}
+        {' '}
         <FaStar icon="fa-solid fa-star" />
+      </p>
+      <p>
+        nº de episódios:
+        {' '}
+        {el.episodesData}
       </p>
       <button type="button">Ver mais </button>
     </S.div>
   ));
   const handleClick = (value) => {
     const verifyOffset = buttonHandler.buttonsHistory.some((el) => el === value);
-    console.log(verifyOffset, 'verify offset', buttonHandler, value);
     if (verifyOffset === true) return setButtonHandler({ ...buttonHandler, currentButton: value });
     fetchCast(value * 40);
     setButtonHandler({ ...buttonHandler, currentButton: value, buttonsHistory: [...buttonHandler.buttonsHistory, value] });
@@ -55,7 +101,7 @@ const AnimesCards = () => {
   ));
 
   const checkRender = () => {
-    if (casting[status.statusNow].categories[status.statusCategorie]) return true;
+    if (casting[status.statusNow].categories[status.statusCategorie.name]) return true;
     return false;
   };
   return (
@@ -63,9 +109,7 @@ const AnimesCards = () => {
       { categorys.data && renderCategorys()}
 
       <S.section>
-        {/* {console.log(casting[status.statusNow].categories[status.statusCategorie].filter((el) => el.offset === currentButton * 40), currentButton * 40)} */}
-        {/* {console.log('filtro', casting[status.statusNow][status.statusCategorie].filter((el) => el))} */}
-        { checkRender() && renderAnimeCards(casting[status.statusNow].categories[status.statusCategorie].filter((el) => el.offset === currentButton * 40)) }
+        { checkRender() && renderAnimeCards(casting[status.statusNow].categories[status.statusCategorie.name].filter((el) => el.offset === currentButton * 40)) }
         <S.ButtonsDiv>
           { buttonsLength && renderButtons() }
         </S.ButtonsDiv>
