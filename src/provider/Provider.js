@@ -69,29 +69,14 @@ const Provider = ({ children }) => {
     const { [status.statusNow]: { categories } } = casting;
     const castingData = await getAnimesByCategorys(0, categoryId, status.statusNow);
 
-    const dataOfCasting = casting[status.statusNow].categories[status.statusCategorie.name];
-
-    if (!dataOfCasting) {
-      const Animedata = castingData.dataNew;
-      setButtonsLength(castingData.totalLength);
-
-      return setCasting({ ...casting,
-        [status.statusNow]: {
-          categories: {
-            ...categories,
-            [status.statusCategorie.name]: Animedata,
-          },
-        },
-
-      });
-    }
-    // const Animedata = dataOfCasting.concat(castingData.dataNew);
-    // console.log(dataOfCasting, 'dataCasting', castingData, 'casting data');
+    const dataOfCasting = casting[status.statusNow].categories[status.statusCategorie.name] || [];
+    const Animedata = dataOfCasting.concat(castingData.dataNew);
 
     setButtonsLength(castingData.totalLength);
     return setCasting({ ...casting,
       [status.statusNow]: {
         categories: {
+          ...categories,
           [status.statusCategorie.name]: Animedata,
         },
       },
