@@ -4,6 +4,7 @@ import { FaStar } from 'react-icons/fa';
 import * as S from '../styles/components/animesCards';
 import { Context } from '../provider/Provider';
 import { getAnimesCategorys } from '../services/api';
+import Footbar from './footbar';
 
 const AnimesCards = () => {
   const { casting, buttonHandler: {
@@ -110,6 +111,7 @@ const AnimesCards = () => {
 
       </S.section>
 
+      <Footbar />
     </div>
   );
 };

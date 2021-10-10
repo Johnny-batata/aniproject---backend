@@ -5,6 +5,7 @@ import * as S from '../styles/components/header';
 const Header = () => (
   <S.Header>
     <FaBars icon="fa-solid fa-bars" />
+    <h1>Current Animes</h1>
     <FaSearch icon="fa-solid fa-search" />
   </S.Header>
 );

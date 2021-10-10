@@ -2,7 +2,8 @@ import styled from 'styled-components';
 
 export const Header = styled.header`
     background-color: orange;
-    height: 40px;
+    /* height: 40px; */
+    height: 56px;
     display: flex;
     align-items: center;
     width: 100%;
