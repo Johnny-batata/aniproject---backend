@@ -20,17 +20,26 @@ const Provider = ({ children }) => {
   const defaultCasting = {
     current: {
       categories: {
-        All: [],
+        All: {
+          animes: [],
+          buttons: [],
+        },
       },
     },
     incoming: {
       categories: {
-        All: [],
+        All: {
+          animes: [],
+          buttons: [],
+        },
       },
     },
     finished: {
       categories: {
-        All: [],
+        All: {
+          animes: [],
+          buttons: [],
+        },
       },
     },
   };
@@ -50,15 +59,20 @@ const Provider = ({ children }) => {
     const { [status.statusNow]: { categories } } = casting;
     const castingData = await getAnimesByStatus(curr, status.statusNow);
 
-    const dataOfCasting = casting[status.statusNow].categories[status.statusCategorie.name];
+    const dataOfCasting = casting[status.statusNow].categories[status.statusCategorie.name].animes;
     const Animedata = dataOfCasting.concat(castingData.dataNew);
+    console.log(dataOfCasting, 'fetchcast', buttonsLength);
 
     setButtonsLength(castingData.totalLength);
     return setCasting({ ...casting,
       [status.statusNow]: {
         categories: {
           ...categories,
-          [status.statusCategorie.name]: Animedata,
+          [status.statusCategorie.name]: {
+            ...[status.statusCategorie.name],
+            animes: Animedata,
+            buttons: castingData.totalLength,
+          },
 
         },
       },
@@ -71,16 +85,30 @@ const Provider = ({ children }) => {
 
     const dataOfCasting = casting[status.statusNow].categories[status.statusCategorie.name] || [];
     const Animedata = dataOfCasting.concat(castingData.dataNew);
+    console.log(castingData, Animedata, 'fectch by categories');
 
     setButtonsLength(castingData.totalLength);
     return setCasting({ ...casting,
       [status.statusNow]: {
         categories: {
           ...categories,
-          [status.statusCategorie.name]: Animedata,
+          [status.statusCategorie.name]: {
+            ...[status.statusCategorie.name],
+            animes: Animedata,
+            buttons: castingData.totalLength,
+          },
+
         },
       },
     });
+    // return setCasting({ ...casting,
+    //   [status.statusNow]: {
+    //     categories: {
+    //       ...categories,
+    //       [status.statusCategorie.name]: Animedata,
+    //     },
+    //   },
+    // });
   };
 
   const context = {

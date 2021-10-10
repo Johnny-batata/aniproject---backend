@@ -7,7 +7,7 @@ import { getAnimesCategorys } from '../services/api';
 
 const AnimesCards = () => {
   const { casting, buttonHandler: {
-    currentButton }, buttonsLength, buttonHandler, setButtonHandler, setCasting, fetchCast, status, categorys, setCategorys, setStatus, fetchCastByCategories } = useContext(Context);
+    currentButton }, buttonsLength, buttonHandler, setButtonHandler, setButtonsLength, fetchCast, status, categorys, setCategorys, setStatus, fetchCastByCategories } = useContext(Context);
 
   const fetchCategorys = async () => {
     const data = await getAnimesCategorys();
@@ -21,8 +21,9 @@ const AnimesCards = () => {
   useEffect(() => {
     const { statusCategorie: { id } } = status;
     const verifyAnimes = Object.keys(casting[status.statusNow].categories).some((el) => el === status.statusCategorie.name);
+    console.log('verify', verifyAnimes);
     if (verifyAnimes) {
-      return;
+      return setButtonsLength(casting[status.statusNow].categories[status.statusCategorie.name].buttons);
     }
 
     fetchCastByCategories(id);
@@ -30,7 +31,7 @@ const AnimesCards = () => {
 
   const changeCategory = ({ target: { value, name } }) => {
     setStatus({ ...status, statusCategorie: { name, id: value } });
-    setButtonHandler({ ...buttonHandler, currentButton: 0, buttonsHistory: 0 });
+    setButtonHandler({ ...buttonHandler, currentButton: [0], buttonsHistory: [0] });
   };
 
   const renderCategorys = () => (
@@ -102,7 +103,7 @@ const AnimesCards = () => {
       { categorys.data && renderCategorys()}
 
       <S.section>
-        { checkRender() && renderAnimeCards(casting[status.statusNow].categories[status.statusCategorie.name].filter((el) => el.offset === currentButton * 40)) }
+        { checkRender() && renderAnimeCards(casting[status.statusNow].categories[status.statusCategorie.name].animes.filter((el) => el.offset === currentButton * 40)) }
         <S.ButtonsDiv>
           { buttonsLength && renderButtons() }
         </S.ButtonsDiv>
