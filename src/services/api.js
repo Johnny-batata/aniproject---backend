@@ -126,5 +126,29 @@ const getAnimesByCategorys = async (offset = 0, categoryId, status) => {
   return { totalLength, dataNew: await Promise.all(dataNew) };
 };
 
+const getProfileInfo = async (email) => {
+  const endpoint = 'http://localhost:10000/profile';
+  const token = localStorage.getItem('token');
+
+  console.log(email, 'get info profile');
+  const responses = fetch(endpoint, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      authorization: token,
+    },
+    body: JSON.stringify({ email }),
+
+  })
+    .then((response) => response.json())
+    .then((data) => data)
+    .catch((err) => err);
+  const data = await responses;
+  // console.log(data, 'batata');
+  if (data.err) { return invokeAlert(data.err.message); }
+  // localStorage.setItem('profileInfo', JSON.stringify(data));
+  return data.user;
+};
+
 export {
-  registerNewUser, loginUser, getAnimesByStatus, getAnimesCategorys, getAnimesByCategorys };
+  registerNewUser, loginUser, getAnimesByStatus, getAnimesCategorys, getAnimesByCategorys, getProfileInfo };

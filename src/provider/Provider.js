@@ -1,7 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { createContext, useEffect, useState } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
-import { getAnimesByStatus, getAnimesByCategorys } from '../services/api';
+import checkPath from '../helpers/functions/checkPath';
+import tokenHandler from '../helpers/functions/tokenHandler';
+import { getAnimesByStatus, getAnimesByCategorys, getProfileInfo } from '../services/api';
 
 const Context = createContext();
 
@@ -54,6 +56,24 @@ const Provider = ({ children }) => {
   const [buttonHandler, setButtonHandler] = useState(defaultButtonHandler);
   const [status, setStatus] = useState(defaultStatus);
   const [categorys, setCategorys] = useState([]);
+  const [profileData, setProfileData] = useState([]);
+  const [barOn, setBar] = useState(false);
+  const [searchBar, setSearchBar] = useState(false);
+
+  const location = useLocation();
+  const history = useHistory();
+
+  const fetchProfileData = async () => {
+    // const verifyPath = checkPath(location);
+    // if (!verifyPath) return;
+
+    const email = localStorage.getItem('usermail');
+
+    const data = await getProfileInfo(email);
+    console.log(data);
+
+    setProfileData([data]);
+  };
 
   const fetchCast = async (curr) => {
     const { [status.statusNow]: { categories } } = casting;
@@ -61,7 +81,7 @@ const Provider = ({ children }) => {
 
     const dataOfCasting = casting[status.statusNow].categories[status.statusCategorie.name].animes;
     const Animedata = dataOfCasting.concat(castingData.dataNew);
-    console.log(dataOfCasting, 'fetchcast', buttonsLength);
+    // console.log(dataOfCasting, 'fetchcast', buttonsLength);
 
     setButtonsLength(castingData.totalLength);
     return setCasting({ ...casting,
@@ -85,7 +105,7 @@ const Provider = ({ children }) => {
 
     const dataOfCasting = casting[status.statusNow].categories[status.statusCategorie.name] || [];
     const Animedata = dataOfCasting.concat(castingData.dataNew);
-    console.log(castingData, Animedata, 'fectch by categories');
+    // console.log(castingData, Animedata, 'fectch by categories');
 
     setButtonsLength(castingData.totalLength);
     return setCasting({ ...casting,
@@ -101,14 +121,14 @@ const Provider = ({ children }) => {
         },
       },
     });
-    // return setCasting({ ...casting,
-    //   [status.statusNow]: {
-    //     categories: {
-    //       ...categories,
-    //       [status.statusCategorie.name]: Animedata,
-    //     },
-    //   },
-    // });
+  };
+
+  const sideBarHandler = () => {
+    setBar(!barOn);
+  };
+
+  const searchBarHandler = () => {
+    setSearchBar(!searchBar);
   };
 
   const context = {
@@ -126,21 +146,21 @@ const Provider = ({ children }) => {
     categorys,
     setCategorys,
     fetchCastByCategories,
-  };
-
-  const location = useLocation();
-  const history = useHistory();
-  const tokenHandler = (token) => {
-    const path = ['/', '/cadastrar'];
-    const checkPath = path.some((el) => location.pathname === el);
-
-    if (!checkPath && !token) return history.push('/');
+    profileData,
+    setProfileData,
+    barOn,
+    setBar,
+    sideBarHandler,
+    searchBar,
+    setSearchBar,
+    searchBarHandler,
   };
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    console.log(location);
-    tokenHandler(token);
+    tokenHandler(token, history, location);
+    fetchProfileData();
+    // console.log(location);
   }, []);
 
   return (

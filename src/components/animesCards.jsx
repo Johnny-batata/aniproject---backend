@@ -8,7 +8,7 @@ import Footbar from './footbar';
 
 const AnimesCards = () => {
   const { casting, buttonHandler: {
-    currentButton }, buttonsLength, buttonHandler, setButtonHandler, setButtonsLength, fetchCast, status, categorys, setCategorys, setStatus, fetchCastByCategories } = useContext(Context);
+    currentButton }, buttonsLength, buttonHandler, setButtonHandler, searchBar, setButtonsLength, fetchCast, status, categorys, setCategorys, setStatus, fetchCastByCategories } = useContext(Context);
 
   const fetchCategorys = async () => {
     const data = await getAnimesCategorys();
@@ -36,7 +36,7 @@ const AnimesCards = () => {
   };
 
   const renderCategorys = () => (
-    <S.Categorydiv>
+    <S.Categorydiv marginTop={ !searchBar ? '56px' : '0px' }>
       <button
         type="button"
         onClick={ changeCategory }

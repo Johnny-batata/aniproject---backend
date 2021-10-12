@@ -1,13 +1,19 @@
 import React from 'react';
 import { FaUser, FaCompass, FaHome } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
 import * as S from '../styles/components/footer';
 
-// <i className="fa-solid fa-house" />;
 const Footbar = () => (
   <S.Footer>
-    <FaCompass icon="fa-solid fa-compass" />
-    <FaHome />
-    <FaUser icon="fa-solid fa-user" />
+    <Link to="/explore">
+      <FaCompass icon="fa-solid fa-compass" />
+    </Link>
+    <Link to="/inicio">
+      <FaHome />
+    </Link>
+    <Link to="/profile">
+      <FaUser icon="fa-solid fa-user" />
+    </Link>
   </S.Footer>
 );
 export default Footbar;

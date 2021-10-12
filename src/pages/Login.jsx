@@ -1,4 +1,5 @@
-import React, { useState, useContext } from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useState, useContext, useEffect } from 'react';
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { Redirect } from 'react-router-dom';
 import { TitleH2, MainDiv, SubTitle, Section, LogoImg } from '../styles/pages/Login';
@@ -24,6 +25,7 @@ const Login = () => {
     const login = await loginUser(userInfo);
     if (login) {
       localStorage.setItem('token', login.token);
+      localStorage.setItem('usermail', userInfo.email);
       return setRedirect(true);
     }
   };

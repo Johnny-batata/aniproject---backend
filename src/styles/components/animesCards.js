@@ -19,11 +19,19 @@ p {
    /* margin-bottom:2px; */
    font-size: 16px;
    margin: 0;
+   white-space:pre;
+    overflow:hidden;
+    text-overflow: ellipsis;
    svg {
       /* background-color: yellow; */
       /* color: yellow; */
       font-size: 16px;
    }
+}
+p:hover{
+   white-space:normal;
+    text-overflow: inherit;
+    overflow: visible;
 }
 
 
@@ -47,6 +55,7 @@ button {
 `;
 
 export const Categorydiv = styled.div`
+margin-top: ${(props) => props.marginTop};
    /* margin-top: 39px; */
    display: flex;
  /* position: relative; */
