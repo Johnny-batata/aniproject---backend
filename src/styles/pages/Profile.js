@@ -2,6 +2,7 @@ import styled from 'styled-components';
 
 export const Div = styled.div`
     display: flex;
+    height: 291.438px;
   section {
     
     display: flex;

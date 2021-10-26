@@ -3,11 +3,11 @@ import styled from 'styled-components';
 export const div = styled.div`
 
  display: flex;
- background-color: red;
-  height: 100%;
- /* height: 100vh; */
+ /* background-color: red; */
+  /* height: 100%; */
+  height: 0px;
  width: 100%;
-  position: relative;
+  /* position: relative; */
   padding: 0;
   flex-wrap: wrap;
   justify-content: center;
