@@ -44,7 +44,23 @@ const Provider = ({ children }) => {
         },
       },
     },
-    all: {
+    All: {
+      categories: {
+        All: {
+          animes: [],
+          buttons: [],
+        },
+      },
+    },
+    Categories: {
+      categories: {
+        All: {
+          animes: [],
+          buttons: [],
+        },
+      },
+    },
+    Movies: {
       categories: {
         All: {
           animes: [],
@@ -83,9 +99,9 @@ const Provider = ({ children }) => {
     const { [status.statusNow]: { categories } } = casting;
     if (path === '/inicio') return getAnimesByStatus(curr, status.statusNow);
     if (path === '/explore/animes') {
-      setStatus({ ...status, statusNow: 'all', statusCategorie: { name: 'All', id: 0 } });
+      // setStatus({ ...status, statusNow: 'batata', statusCategorie: { name: 'All', id: 0 } });
 
-      return getAllAnimes(curr, status.statusNow);
+      return getAllAnimes(curr);
     }
     return true;
   };
@@ -95,12 +111,13 @@ const Provider = ({ children }) => {
 
     const castingData = await checkCasting(curr, loc);
     // const castingData = await getAnimesByStatus(curr, status.statusNow);
-    console.log('location', loc);
+    console.log('casting', castingData);
 
     const dataOfCasting = casting[status.statusNow].categories[status.statusCategorie.name].animes;
     const Animedata = dataOfCasting.concat(castingData.dataNew);
 
-    console.log('status', [status.statusNow]);
+    console.log('offset', curr);
+    console.log('carregou');
 
     setButtonsLength(castingData.totalLength);
     return setCasting({ ...casting,
@@ -120,6 +137,8 @@ const Provider = ({ children }) => {
   const fetchCastByCategories = async (categoryId) => {
     const { [status.statusNow]: { categories } } = casting;
     const castingData = await getAnimesByCategorys(0, categoryId, status.statusNow);
+    // const castingData = await getAnimesByCategorys(0, categoryId);
+    console.log(categoryId, status.statusNow, 'status');
 
     const dataOfCasting = casting[status.statusNow].categories[status.statusCategorie.name] || [];
     const Animedata = dataOfCasting.concat(castingData.dataNew);

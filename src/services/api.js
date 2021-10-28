@@ -93,12 +93,12 @@ const getAllAnimes = async (offset = 0, filter = 'averageRating') => {
   const endpoint = `http://localhost:10000/animes/${offset}`;
   const token = localStorage.getItem('token');
   const responses = await fetch(endpoint, {
-    method: 'GET',
+    method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       authorization: token,
-      body: JSON.stringify({ ...filter }),
     },
+    body: JSON.stringify({ filter }),
   })
     .then((response) => response.json())
     .then((data) => data)
@@ -110,7 +110,16 @@ const getAllAnimes = async (offset = 0, filter = 'averageRating') => {
   const dataNew = data.data.map(async ({
     id, attributes: { titles: { en_jp }, updatedAt, posterImage: { tiny }, averageRating,
     }, totalEpisodes, categoriasId,
-  }) => ({ id, title: en_jp, updatedAt, tiny, averageRating, offset, categoriasId, episodesData: totalEpisodes }));
+  }) => ({
+    id,
+    title: en_jp,
+    updatedAt,
+    tiny,
+    averageRating,
+    offset,
+    categoriasId,
+    episodesData: totalEpisodes,
+  }));
 
   const totalLength = [];
   for (let i = 1; (i * 40) <= (data.totalLength + 40); i += 1) {
@@ -138,7 +147,16 @@ const getAnimesByCategorys = async (offset = 0, categoryId, status) => {
   const dataNew = data.data.map(async ({
     id, attributes: { titles: { en_jp }, updatedAt, posterImage: { tiny }, averageRating,
     }, totalEpisodes, categoriasId,
-  }) => ({ id, title: en_jp, updatedAt, tiny, averageRating, offset, categoriasId, episodesData: totalEpisodes }));
+  }) => ({
+    id,
+    title: en_jp,
+    updatedAt,
+    tiny,
+    averageRating,
+    offset,
+    categoriasId,
+    episodesData: totalEpisodes,
+  }));
 
   const totalLength = [];
   for (let i = 1; (i * 40) <= (data.totalLength + 40); i += 1) {

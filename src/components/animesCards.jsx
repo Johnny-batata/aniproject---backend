@@ -11,7 +11,8 @@ import Footbar from './footbar';
 const AnimesCards = () => {
   const { casting, buttonHandler: {
     currentButton },
-  buttonsLength, buttonHandler, setButtonHandler,
+  buttonsLength, buttonHandler,
+  buttonHandler: { offset, buttonsHistory }, setButtonHandler,
   searchBar, setButtonsLength, fetchCast, status, categorys, setCategorys, setStatus,
   fetchCastByCategories } = useContext(Context);
 
@@ -25,6 +26,14 @@ const AnimesCards = () => {
     // fetchCast(currentButton * 40);
     fetchCategorys();
   }, []);
+
+  useEffect(() => {
+    const verifyOffset = buttonHandler.buttonsHistory.some((el) => el === currentButton);
+
+    if (verifyOffset === true) {
+      fetchCast(currentButton * 40, location.pathname);
+    }
+  }, [buttonsHistory]);
 
   useEffect(() => {
     const { statusCategorie: { id } } = status;
@@ -69,25 +78,28 @@ const AnimesCards = () => {
     </S.Categorydiv>
   );
 
-  const renderAnimeCards = (dataToMap) => dataToMap.map((el, index) => (
-    <S.div key={ index }>
-      <img src={ el.tiny } alt={ el.title } />
-      <p>
-        {el.title}
-      </p>
-      <p>
-        {el.averageRating}
-        {' '}
-        <FaStar icon="fa-solid fa-star" />
-      </p>
-      <p>
-        nº de episódios:
-        {' '}
-        {el.episodesData}
-      </p>
-      <button type="button">Ver mais </button>
-    </S.div>
-  ));
+  const renderAnimeCards = (dataToMap) => {
+    console.log(location.pathname);
+    return dataToMap.map((el, index) => (
+      <S.div key={ index }>
+        <img src={ el.tiny } alt={ el.title } />
+        <p>
+          {el.title}
+        </p>
+        <p>
+          {el.averageRating}
+          {' '}
+          <FaStar icon="fa-solid fa-star" />
+        </p>
+        <p>
+          nº de episódios:
+          {' '}
+          {el.episodesData}
+        </p>
+        <button type="button">Ver mais </button>
+      </S.div>
+    ));
+  };
 
   const handleClick = (value) => {
     const verifyOffset = buttonHandler.buttonsHistory.some((el) => el === value);
@@ -95,10 +107,11 @@ const AnimesCards = () => {
       return setButtonHandler({ ...buttonHandler,
         currentButton: value });
     }
-    fetchCast(value * 40, location);
     setButtonHandler({ ...buttonHandler,
       currentButton: value,
-      buttonsHistory: [...buttonHandler.buttonsHistory, value] });
+      buttonsHistory: [...buttonHandler.buttonsHistory, value],
+      offset: value * 40,
+    });
   };
 
   const renderButtons = () => buttonsLength.map((el, index) => (
@@ -118,11 +131,10 @@ const AnimesCards = () => {
       { categorys.data && renderCategorys()}
 
       <S.section>
-        {/* { checkRender() && renderAnimeCards(
+        { checkRender() && renderAnimeCards(
           casting[status.statusNow].categories[status.statusCategorie.name].animes
             .filter((el) => el.offset === currentButton * 40),
-        ) } */}
-        {console.log(casting[status.statusNow].categories[status.statusCategorie.name].animes, 'casting safado')}
+        ) }
         <S.ButtonsDiv>
           { buttonsLength && renderButtons() }
         </S.ButtonsDiv>
