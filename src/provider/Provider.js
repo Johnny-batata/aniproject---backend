@@ -3,7 +3,7 @@ import React, { createContext, useEffect, useState } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import checkPath from '../helpers/functions/checkPath';
 import tokenHandler from '../helpers/functions/tokenHandler';
-import { getAnimesByStatus, getAnimesByCategorys, getProfileInfo } from '../services/api';
+import { getAnimesByStatus, getAnimesByCategorys, getProfileInfo, getAllAnimes } from '../services/api';
 
 const Context = createContext();
 
@@ -44,6 +44,30 @@ const Provider = ({ children }) => {
         },
       },
     },
+    All: {
+      categories: {
+        All: {
+          animes: [],
+          buttons: [],
+        },
+      },
+    },
+    Categories: {
+      categories: {
+        All: {
+          animes: [],
+          buttons: [],
+        },
+      },
+    },
+    Movies: {
+      categories: {
+        All: {
+          animes: [],
+          buttons: [],
+        },
+      },
+    },
   };
 
   const defaultStatus = {
@@ -64,24 +88,36 @@ const Provider = ({ children }) => {
   const history = useHistory();
 
   const fetchProfileData = async () => {
-    // const verifyPath = checkPath(location);
-    // if (!verifyPath) return;
-
     const email = localStorage.getItem('usermail');
 
     const data = await getProfileInfo(email);
-    console.log(data);
 
     setProfileData([data]);
   };
 
-  const fetchCast = async (curr) => {
+  const checkCasting = async (curr, path) => {
     const { [status.statusNow]: { categories } } = casting;
-    const castingData = await getAnimesByStatus(curr, status.statusNow);
+    if (path === '/inicio') return getAnimesByStatus(curr, status.statusNow);
+    if (path === '/explore/animes') {
+      // setStatus({ ...status, statusNow: 'batata', statusCategorie: { name: 'All', id: 0 } });
+
+      return getAllAnimes(curr);
+    }
+    return true;
+  };
+
+  const fetchCast = async (curr, loc) => {
+    const { [status.statusNow]: { categories } } = casting;
+
+    const castingData = await checkCasting(curr, loc);
+    // const castingData = await getAnimesByStatus(curr, status.statusNow);
+    console.log('casting', castingData);
 
     const dataOfCasting = casting[status.statusNow].categories[status.statusCategorie.name].animes;
     const Animedata = dataOfCasting.concat(castingData.dataNew);
-    // console.log(dataOfCasting, 'fetchcast', buttonsLength);
+
+    console.log('offset', curr);
+    console.log('carregou');
 
     setButtonsLength(castingData.totalLength);
     return setCasting({ ...casting,
@@ -93,7 +129,6 @@ const Provider = ({ children }) => {
             animes: Animedata,
             buttons: castingData.totalLength,
           },
-
         },
       },
     });
@@ -102,10 +137,11 @@ const Provider = ({ children }) => {
   const fetchCastByCategories = async (categoryId) => {
     const { [status.statusNow]: { categories } } = casting;
     const castingData = await getAnimesByCategorys(0, categoryId, status.statusNow);
+    // const castingData = await getAnimesByCategorys(0, categoryId);
+    console.log(categoryId, status.statusNow, 'status');
 
     const dataOfCasting = casting[status.statusNow].categories[status.statusCategorie.name] || [];
     const Animedata = dataOfCasting.concat(castingData.dataNew);
-    // console.log(castingData, Animedata, 'fectch by categories');
 
     setButtonsLength(castingData.totalLength);
     return setCasting({ ...casting,
@@ -117,7 +153,6 @@ const Provider = ({ children }) => {
             animes: Animedata,
             buttons: castingData.totalLength,
           },
-
         },
       },
     });
@@ -160,7 +195,6 @@ const Provider = ({ children }) => {
     const token = localStorage.getItem('token');
     tokenHandler(token, history, location);
     fetchProfileData();
-    // console.log(location);
   }, []);
 
   return (

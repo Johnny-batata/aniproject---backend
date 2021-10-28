@@ -58,13 +58,9 @@ const getAnimesByStatus = async (offset = 0, status = 'CURRENT') => {
   const data = await responses;
   if (data.err) { return invokeAlert(data.err.message); }
   const dataNew = data.data.map(async ({
-    id, attributes: { titles: { en_jp }, updatedAt, posterImage: { tiny }, averageRating }, relationships: { episodes: { links: { self } } }, categoriasId,
-  }) => {
-    const fetchEpisodes = await fetch(self);
-    const episodesData = await fetchEpisodes.json();
-
-    return { id, title: en_jp, updatedAt, tiny, averageRating, offset, categoriasId, episodesData: episodesData.data.length };
-  });
+    id, attributes: { titles: { en_jp }, updatedAt, posterImage: { tiny }, averageRating,
+    }, totalEpisodes, categoriasId,
+  }) => ({ id, title: en_jp, updatedAt, tiny, averageRating, offset, categoriasId, episodesData: totalEpisodes }));
 
   const totalLength = [];
   for (let i = 1; (i * 40) <= (data.totalLength + 40); i += 1) {
@@ -93,6 +89,45 @@ const getAnimesCategorys = async (offset = 0) => {
   return data.data;
 };
 
+const getAllAnimes = async (offset = 0, filter = 'averageRating') => {
+  const endpoint = `http://localhost:10000/animes/${offset}`;
+  const token = localStorage.getItem('token');
+  const responses = await fetch(endpoint, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      authorization: token,
+    },
+    body: JSON.stringify({ filter }),
+  })
+    .then((response) => response.json())
+    .then((data) => data)
+    .catch((err) => err);
+  console.log(responses, 'responses');
+
+  const data = await responses;
+  if (data.err) { return invokeAlert(data.err.message); }
+  const dataNew = data.data.map(async ({
+    id, attributes: { titles: { en_jp }, updatedAt, posterImage: { tiny }, averageRating,
+    }, totalEpisodes, categoriasId,
+  }) => ({
+    id,
+    title: en_jp,
+    updatedAt,
+    tiny,
+    averageRating,
+    offset,
+    categoriasId,
+    episodesData: totalEpisodes,
+  }));
+
+  const totalLength = [];
+  for (let i = 1; (i * 40) <= (data.totalLength + 40); i += 1) {
+    totalLength.push(i);
+  }
+  return { totalLength, dataNew: await Promise.all(dataNew) };
+};
+
 const getAnimesByCategorys = async (offset = 0, categoryId, status) => {
   const endpoint = `http://localhost:10000/animesCategorys/${offset}/${categoryId}/${status}`;
   const token = localStorage.getItem('token');
@@ -108,16 +143,20 @@ const getAnimesByCategorys = async (offset = 0, categoryId, status) => {
     .catch((err) => err);
 
   const data = await responses;
-  // console.log(data, 'data');
   if (data.err) { return invokeAlert(data.err.message); }
   const dataNew = data.data.map(async ({
-    id, attributes: { titles: { en_jp }, updatedAt, posterImage: { tiny }, averageRating }, relationships: { episodes: { links: { self } } }, categoriasId,
-  }) => {
-    const fetchEpisodes = await fetch(self);
-    const episodesData = await fetchEpisodes.json();
-
-    return { id, title: en_jp, updatedAt, tiny, averageRating, offset, categoriasId, episodesData: episodesData.data.length };
-  });
+    id, attributes: { titles: { en_jp }, updatedAt, posterImage: { tiny }, averageRating,
+    }, totalEpisodes, categoriasId,
+  }) => ({
+    id,
+    title: en_jp,
+    updatedAt,
+    tiny,
+    averageRating,
+    offset,
+    categoriasId,
+    episodesData: totalEpisodes,
+  }));
 
   const totalLength = [];
   for (let i = 1; (i * 40) <= (data.totalLength + 40); i += 1) {
@@ -144,11 +183,11 @@ const getProfileInfo = async (email) => {
     .then((data) => data)
     .catch((err) => err);
   const data = await responses;
-  // console.log(data, 'batata');
   if (data.err) { return invokeAlert(data.err.message); }
-  // localStorage.setItem('profileInfo', JSON.stringify(data));
   return data.user;
 };
 
 export {
-  registerNewUser, loginUser, getAnimesByStatus, getAnimesCategorys, getAnimesByCategorys, getProfileInfo };
+  registerNewUser,
+  loginUser, getAnimesByStatus, getAnimesCategorys,
+  getAnimesByCategorys, getProfileInfo, getAllAnimes };

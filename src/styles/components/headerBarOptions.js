@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 export const Div = styled.div`
-  background-color: red;
+  /* background-color: red; */
  position: fixed;
  background-color: peachpuff;
   display: flex;
@@ -9,6 +9,7 @@ export const Div = styled.div`
  /* width: 15%; */
  flex-direction: column;
     align-items: center;
+    width: 35%;
 
   section {
   display: flex;
