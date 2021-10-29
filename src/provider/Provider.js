@@ -154,10 +154,11 @@ const Provider = ({ children }) => {
     });
   };
 
-  fetchCastById = async (id) => {
+  const fetchCastById = async (id) => {
     const animes = await getAnimeById(id);
-    console.log(animes, 'fetchcast by id');
-    return setAnimeOnDetails(animes);
+    console.log(animes.dataNew, 'fetchcast by id');
+    console.log('fetchcast by id');
+    return setAnimeOnDetails(animes.dataNew);
   };
 
   const sideBarHandler = () => {
@@ -192,6 +193,7 @@ const Provider = ({ children }) => {
     setSearchBar,
     searchBarHandler,
     animeOnDetails,
+    fetchCastById,
   };
 
   useEffect(() => {

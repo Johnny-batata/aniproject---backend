@@ -6,7 +6,7 @@ import Home from './pages/Home';
 import Profile from './pages/Profile';
 import Explore from './pages/explore/explore';
 import Animes from './pages/explore/animes';
-import Categories from './pages/explore/categories';
+// import Categories from './pages/explore/categories';
 import Movies from './pages/explore/movies';
 import CardsDetails from './components/cardsDetails';
 

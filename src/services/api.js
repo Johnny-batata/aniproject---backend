@@ -235,30 +235,29 @@ const getAnimeById = async (id) => {
       'Content-Type': 'application/json',
       authorization: token,
     },
-    body: JSON.stringify({ filter }),
   })
     .then((response) => response.json())
     .then((data) => data)
     .catch((err) => err);
-  console.log(responses, 'responses');
+  // console.log(responses, 'responses');
 
-  const data = await responses;
-  if (data.err) { return invokeAlert(data.err.message); }
-  const dataNew = data.data.map(async ({
-    id, attributes: { titles: { en_jp }, updatedAt, posterImage: { tiny }, averageRating,
-    }, totalEpisodes, categoriasId,
-  }) => ({
-    id,
-    title: en_jp,
-    updatedAt,
-    tiny,
-    averageRating,
-    offset,
-    categoriasId,
-    episodesData: totalEpisodes,
-  }));
+  // const data = await responses;
+  // if (data.err) { return invokeAlert(data.err.message); }
+  // const dataNew = data
+  // .data.map(async ({
+  //   id, attributes: { titles: { en_jp }, updatedAt, posterImage: { tiny }, averageRating,
+  //   }, totalEpisodes, categoriasId,
+  // }) => ({
+  //   id,
+  //   title: en_jp,
+  //   updatedAt,
+  //   tiny,
+  //   averageRating,
+  //   categoriasId,
+  //   episodesData: totalEpisodes,
+  // }));
 
-  return { dataNew: await Promise.all(dataNew) };
+  return { dataNew: responses.data };
 };
 
 export {
