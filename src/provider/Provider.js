@@ -85,7 +85,7 @@ const Provider = ({ children }) => {
   const [profileData, setProfileData] = useState([]);
   const [barOn, setBar] = useState(false);
   const [searchBar, setSearchBar] = useState(false);
-  const [animeOnDetails, setAnimeOnDetails] = useState({});
+  const [animeOnDetails, setAnimeOnDetails] = useState([]);
 
   const location = useLocation();
   const history = useHistory();
