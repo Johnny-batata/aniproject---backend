@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useContext } from 'react';
 import { FaStar } from 'react-icons/fa';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import * as S from '../styles/components/animesCards';
 import { Context } from '../provider/Provider';
 import { getAnimesCategorys } from '../services/api';
@@ -20,11 +20,35 @@ const AnimesCards = () => {
     const data = await getAnimesCategorys();
     return setCategorys({ ...categorys, data });
   };
+
   const location = useLocation();
+  const callsInitialsFetchs = async () => {
+    await fetchCast(currentButton * 40, location.pathname);
+    await fetchCategorys();
+  };
+  const callsInitialSetStatus = async () => {
+    if (location.pathname === '/explore/movies') {
+      await setStatus({
+        ...status, statusNow: 'Movies', statusCategorie: { name: 'All', id: 0 } });
+    }
+    if (location.pathname === '/inicio') {
+      await setStatus({
+        ...status, statusNow: 'current', statusCategorie: { name: 'All', id: 0 } });
+    }
+    if (location.pathname === '/explore/animes') {
+      await setStatus({
+        ...status, statusNow: 'All', statusCategorie: { name: 'All', id: 0 } });
+    }
+  };
+
   useEffect(() => {
-    fetchCast(currentButton * 40, location.pathname);
-    // fetchCast(currentButton * 40);
-    fetchCategorys();
+    callsInitialsFetchs();
+  }, [status.statusNow]);
+
+  useEffect(() => {
+    callsInitialSetStatus();
+
+    console.log('location path', location.pathnam);
   }, []);
 
   useEffect(() => {
@@ -96,7 +120,9 @@ const AnimesCards = () => {
           {' '}
           {el.episodesData}
         </p>
-        <button type="button">Ver mais </button>
+        <Link to={ `/detalhes/${el.id}` }>
+          <button type="button">Ver mais </button>
+        </Link>
       </S.div>
     ));
   };

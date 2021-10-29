@@ -3,7 +3,9 @@ import React, { createContext, useEffect, useState } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import checkPath from '../helpers/functions/checkPath';
 import tokenHandler from '../helpers/functions/tokenHandler';
-import { getAnimesByStatus, getAnimesByCategorys, getProfileInfo, getAllAnimes } from '../services/api';
+import {
+  getAnimesByStatus,
+  getAnimesByCategorys, getProfileInfo, getAllAnimes, getAllMovies, getAnimeById } from '../services/api';
 
 const Context = createContext();
 
@@ -83,6 +85,7 @@ const Provider = ({ children }) => {
   const [profileData, setProfileData] = useState([]);
   const [barOn, setBar] = useState(false);
   const [searchBar, setSearchBar] = useState(false);
+  const [animeOnDetails, setAnimeOnDetails] = useState({});
 
   const location = useLocation();
   const history = useHistory();
@@ -98,11 +101,9 @@ const Provider = ({ children }) => {
   const checkCasting = async (curr, path) => {
     const { [status.statusNow]: { categories } } = casting;
     if (path === '/inicio') return getAnimesByStatus(curr, status.statusNow);
-    if (path === '/explore/animes') {
-      // setStatus({ ...status, statusNow: 'batata', statusCategorie: { name: 'All', id: 0 } });
+    if (path === '/explore/animes') return getAllAnimes(curr);
+    if (path === '/explore/movies') return getAllMovies(curr);
 
-      return getAllAnimes(curr);
-    }
     return true;
   };
 
@@ -110,14 +111,10 @@ const Provider = ({ children }) => {
     const { [status.statusNow]: { categories } } = casting;
 
     const castingData = await checkCasting(curr, loc);
-    // const castingData = await getAnimesByStatus(curr, status.statusNow);
     console.log('casting', castingData);
 
     const dataOfCasting = casting[status.statusNow].categories[status.statusCategorie.name].animes;
     const Animedata = dataOfCasting.concat(castingData.dataNew);
-
-    console.log('offset', curr);
-    console.log('carregou');
 
     setButtonsLength(castingData.totalLength);
     return setCasting({ ...casting,
@@ -137,8 +134,7 @@ const Provider = ({ children }) => {
   const fetchCastByCategories = async (categoryId) => {
     const { [status.statusNow]: { categories } } = casting;
     const castingData = await getAnimesByCategorys(0, categoryId, status.statusNow);
-    // const castingData = await getAnimesByCategorys(0, categoryId);
-    console.log(categoryId, status.statusNow, 'status');
+    console.log(categoryId, status.statusNow, 'status', castingData);
 
     const dataOfCasting = casting[status.statusNow].categories[status.statusCategorie.name] || [];
     const Animedata = dataOfCasting.concat(castingData.dataNew);
@@ -156,6 +152,12 @@ const Provider = ({ children }) => {
         },
       },
     });
+  };
+
+  fetchCastById = async (id) => {
+    const animes = await getAnimeById(id);
+    console.log(animes, 'fetchcast by id');
+    return setAnimeOnDetails(animes);
   };
 
   const sideBarHandler = () => {
@@ -189,6 +191,7 @@ const Provider = ({ children }) => {
     searchBar,
     setSearchBar,
     searchBarHandler,
+    animeOnDetails,
   };
 
   useEffect(() => {
